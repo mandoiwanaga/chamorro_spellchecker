@@ -12,7 +12,6 @@ with open('webapp/cham_words_dict.pkl', 'rb') as f:
 with open('webapp/cham_words_df.pkl', 'rb') as f:
     df = pickle.load(f)
 
-
 app = Flask(__name__, static_url_path="")
 
 @app.route('/')
@@ -68,11 +67,9 @@ def check_spelling(word):
         return correction_3(word)
 
 
-
-
 @app.route('/predict', methods=['GET', 'POST'])
 def predict():
     """Return recommendations."""
     word = request.json
-    recs = check_spelling(str[word['user_input']])
+    recs = check_spelling(str(word['user_input']))
     return jsonify({'recs': recs})
