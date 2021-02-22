@@ -1,23 +1,24 @@
+from flask import Flask, request, render_template, jsonify
 import pandas as pd
 from collections import Counter
-import numpy as np
+import numpy as np 
+import pickle
 
 
 
-def remove_brackets(list1):
-    """Remove brackets from text"""
-    return str(list1).replace('[','').replace(']','')
-
-def remove_quotations1(list1):
-    return list1.strip('\"')
-
-def remove_quotations2(list1):
-    return list1.strip('\'')
+with open('webapp/cham_words_dict.pkl', 'rb') as f:
+    WORDS = pickle.load(f)
+    
+with open('webapp/cham_words_df.pkl', 'rb') as f:
+    df = pickle.load(f)
 
 
+app = Flask(__name__, static_url_path="")
 
-
-
+@app.route('/')
+def index():
+    """Return the main page."""
+    return render_template('index.html')
 
 def edits1(word):
     "All edits that are one edit away from `word`."
@@ -29,14 +30,16 @@ def edits1(word):
     inserts    = [L + c + R               for L, R in splits for c in letters]
     return set(deletes + transposes + replaces + inserts)
 
-def edits2(word): 
-    return (e2 for e1 in edits1(word) for e2 in edits1(e1))
 
 def known(words): 
     return set(w for w in words if w in WORDS)
 
+def edits2(word): 
+    return (e2 for e1 in edits1(word) for e2 in edits1(e1))
+
 def P(word, N=sum(WORDS.values())): 
     return WORDS[word] / N
+
 
 def correction(word): 
     return max(candidates(word), key=P)
@@ -57,10 +60,19 @@ def correction_3(word):
         recs[i] = df.loc[df['word'] == i].definition.values[0]
     return recs
 
-def check_spelling():
-    print( "What word would you like to spell-check?")
-    word = input()
+
+def check_spelling(word):
     if [word] == correction_2(word):
         return print("No Spelling Suggestions Available")
     else:
         return correction_3(word)
+
+
+
+
+@app.route('/predict', methods=['GET', 'POST'])
+def predict():
+    """Return recommendations."""
+    word = request.json
+    recs = check_spelling(str[word['user_input']])
+    return jsonify({'recs': recs})
