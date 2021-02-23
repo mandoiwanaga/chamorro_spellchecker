@@ -6,10 +6,10 @@ import pickle
 
 
 
-with open('webapp/cham_words_dict.pkl', 'rb') as f:
+with open('cham_words_dict.pkl', 'rb') as f:
     WORDS = pickle.load(f)
     
-with open('webapp/cham_words_df.pkl', 'rb') as f:
+with open('cham_words_df.pkl', 'rb') as f:
     df = pickle.load(f)
 
 app = Flask(__name__, static_url_path="")
@@ -20,7 +20,7 @@ def index():
     return render_template('index.html')
 
 def edits1(word):
-    "All edits that are one edit away from `word`."
+    "All edits that are one edit away from word."
     letters    = "åabcdefghijklmnñopqrstuvwxyz'"
     splits     = [(word[:i], word[i:])    for i in range(len(word) + 1)]
     deletes    = [L + R[1:]               for L, R in splits if R]
@@ -73,3 +73,4 @@ def predict():
     word = request.json
     recs = check_spelling(str(word['user_input']))
     return jsonify({'recs': recs})
+    
