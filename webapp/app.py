@@ -5,7 +5,6 @@ import numpy as np
 import pickle
 
 
-
 with open('webapp/cham_words_dict.pkl', 'rb') as f:
     WORDS = pickle.load(f)
     
@@ -13,6 +12,9 @@ with open('webapp/cham_words_df.pkl', 'rb') as f:
     df = pickle.load(f)
 
 app = Flask(__name__, static_url_path="")
+
+app.config['JSON_AS_ASCII'] = False
+
 
 @app.route('/')
 def index():
