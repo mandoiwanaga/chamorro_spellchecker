@@ -13,9 +13,29 @@
 
       def show_results(response):
           if response.status==200 or response.status==0:
-              document["result"].html = response.text
+            result = json.loads(response.text)
+                      
+            html = '''
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="text-center"></th>
+                        <th>Recommendations</th>
+                    </tr>
+                </thead>
+                <tbody>
+            '''
+            
+
+            for i, row in enumerate(result['recs'].items()):
+              html += f'<tr><td class="text-center">{i+1}</td><td> { row } </td></tr>'
+ 
+            html +='</tbody></table>'
+
+            document["result"].html = html
           else:
               warnings.warn(response.text)
+
 
       def get_prediction(ev):
           """Get the predicted probability."""
